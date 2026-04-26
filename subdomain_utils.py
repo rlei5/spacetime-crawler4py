@@ -1,5 +1,6 @@
 import shelve
 from urllib.parse import urlparse
+import analytics_utils
 
 SAVE_FILE = "crawler_data"
 _SAVE_EVERY = 50  # save every 50 pages
@@ -19,8 +20,11 @@ def save():
     with shelve.open(SAVE_FILE) as db:
         db["subdomains"] = {k: list(v) for k, v in _state["subdomains"].items()}
         db["unique_pages"] = list(_state["unique_pages"])
-        import analytics_utils
         db["word_freq"], db["longest_page"] = analytics_utils.get_report_data()
+
+    print(f"[SAVE] {_state['_visit_count']} pages visited | "
+          f"{len(_state['unique_pages'])} unique | "
+          f"{len(_state['subdomains'])} subdomains found")
 
 """
 def get_report_data():
