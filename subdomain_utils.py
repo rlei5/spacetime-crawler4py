@@ -15,6 +15,7 @@ def _load():
     with shelve.open(SAVE_FILE) as db:
         _state["subdomains"] = {k: set(v) for k, v in db.get("subdomains", {}).items()}
         _state["unique_pages"] = set(db.get("unique_pages", set()))
+        _state["_visit_count"] = db.get("_visit_count", 0)
 
 def save():
     with shelve.open(SAVE_FILE) as db:
