@@ -44,6 +44,9 @@ def is_valid(url):
         parsed = urlparse(url)
         if parsed.scheme not in set(["http", "https"]):
             return False
+        # Make sure to crawl only the URls allowed by the assignment
+        if not re.match(.*(ics|cs|informatics|stat).uci.edu, parsed.hostname):
+            return False
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
             + r"|png|tiff?|mid|mp2|mp3|mp4"
