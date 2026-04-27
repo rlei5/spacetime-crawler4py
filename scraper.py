@@ -47,6 +47,9 @@ def is_valid(url):
         # Make sure to crawl only the URls allowed by the assignment
         if not re.match(.*(ics|cs|informatics|stat).uci.edu, parsed.hostname):
             return False
+        # Try to avoid links that have infinite length
+        if parsed.path.count("/") > 10:
+            return False
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
             + r"|png|tiff?|mid|mp2|mp3|mp4"
