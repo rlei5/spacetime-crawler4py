@@ -27,8 +27,11 @@ def extract_next_links(url, resp):
                 continue
             absolute_url = urljoin(url, href)
             clean_url, _ = urldefrag(absolute_url)
-            if clean_url:
-                links.add(clean_url)
+            if not clean_url.startswith("http"):
+                continue
+            if len(clean_url) > 200:
+                continue
+            links.add(clean_url)
     except Exception as e:
         print("Error extracting links from", url, ":", e)
     return list(links)
