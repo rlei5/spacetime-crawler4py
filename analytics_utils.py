@@ -17,30 +17,35 @@ STOP_WORDS = ["a", "about", "above", "after", "again", "against", "all", "am", "
               "we'd", "we'll", "we're", "we've", "were", "weren't", "what", "what's", "when", "when's", "where",
               "where's", "which", "while", "who", "who's", "whom", "why", "why's", "with", "won't", "would",
               "wouldn't", "you", "you'd", "you'll", "you're", "you've", "your", "yours", "yourself", "yourselves"]
-class Analyzer:
-    word_freq = {}
-    longest_page_url = ''
-    max_number_of_words = 0
 
-    def get_report_data(self) -> tuple[list[str], str]:
-        return find_top_fifty_words(self.word_freq), self.longest_page_url
+word_freq = {}
+longest_page_url = ''
+max_number_of_words = 0
 
-    def process_text(self, url, content) -> None:
-        soup = BeautifulSoup(content, "html.parser")
-        tokens = tokenize(soup)
+def get_report_data() -> tuple[dict, tuple[str, int]]:
+    return find_top_fifty_words(), (longest_page_url, max_number_of_words)
 
-        # longest page check
-        if len(tokens) > self.max_number_of_words:
-            self.max_number_of_words = len(tokens)
-            self.longest_page_url = url
+def process_text(url, content) -> None:
+    global word_freq
+    global longest_page_url
+    global max_number_of_words
 
-        # add to word frequencies
-        page_word_frequencies = Counter(computeWordFrequencies(tokens))
-        self.word_freq = Counter(self.word_freq) + page_word_frequencies
+    soup = BeautifulSoup(content, "html.parser")
+    tokens = tokenize(soup)
 
-# note that each token is a word so it's possible that the most common words might be single characters that are separated by apostrophes
-def find_top_fifty_words(word_freq) -> list[str]:
-    return sorted(word_freq, key = word_freq.get, reverse = True)[:50]
+    # longest page check
+    if len(tokens) > max_number_of_words:
+        max_number_of_words = len(tokens)
+        longest_page_url = url
+
+    # add to word frequencies
+    page_word_frequencies = Counter(computeWordFrequencies(tokens))
+    word_freq = Counter(word_freq) + page_word_frequencies
+
+# note that each token is a word, so it's possible that the most common words might be single characters that are separated by apostrophes
+def find_top_fifty_words() -> dict:
+    return {k: v for k, v in sorted(word_freq.items(), key = lambda item: item[1], reverse = True)}[:50]
+
 def computeWordFrequencies(tokens_list: list[str]) -> dict[str]:
     tokens_dict = {}
 
