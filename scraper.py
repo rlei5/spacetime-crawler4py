@@ -96,9 +96,9 @@ def is_valid(url):
         # Avoid common trap patterns in path or query
         if re.search(r"(calendar|filter|sort|offset|session)", parsed.path.lower()):
             return False
-        if re.search(r"/\d{4}-\d{2}-\d{2}", parsed.path.lower()):
+        if re.search(r"/\d{4}-\d{2}(-\d{2})?|/\d{4}/\d{2}", parsed.path.lower()):
             return False
-        if re.search(r"(tribe-bar-date|ical|eventDisplay|date=|page=|share=)", parsed.query.lower()):
+        if re.search(r"(tribe-bar-date|ical|eventDisplay|date=|page=|share=|month=|week=)", parsed.query.lower()):
             return False
         # block dale-cooper trap domain
         if re.search(r"dale-cooper", parsed.hostname):
