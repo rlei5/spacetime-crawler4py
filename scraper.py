@@ -72,7 +72,7 @@ def is_valid(url):
         if parsed.scheme not in set(["http", "https"]):
             return False
         # Make sure to crawl only the URls allowed by the assignment
-        if not re.search(r"(ics|cs|informatics|stat)\.uci\.edu$", parsed.hostname):
+        if not re.search(r"(^|\.)((ics|cs|informatics|stat)\.uci\.edu)$", parsed.hostname):
             return False
         # Avoid known trap domains
         if re.search(r"(wics\.ics|ngs\.ics|gitlab\.ics|grape\.ics)\.uci\.edu$", parsed.hostname):
@@ -81,7 +81,7 @@ def is_valid(url):
         if re.search(r"~eppstein/pix", url.lower()):
             return False
         if re.search(r"doku\.php", parsed.path.lower()):
-            if re.search(r"(do=|idx=|maint:)", parsed.query.lower()):
+            if re.search(r"(do=|idx=|maint:|rev=|diff|oldid=|s\[\]=)", parsed.query.lower()):
                 return False
         # Try to avoid links that have infinite length
         if parsed.path.count("/") > 20:
@@ -99,6 +99,12 @@ def is_valid(url):
         if re.search(r"/\d{4}-\d{2}-\d{2}", parsed.path.lower()):
             return False
         if re.search(r"(tribe-bar-date|ical|eventDisplay|date=|page=|share=)", parsed.query.lower()):
+            return False
+        # block dale-cooper trap domain
+        if re.search(r"dale-cooper", parsed.hostname):
+            return False
+        # block action=update pattern
+        if re.search(r"action=update", parsed.query.lower()):
             return False
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
