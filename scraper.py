@@ -96,6 +96,8 @@ def is_valid(url):
         # Avoid common trap patterns in path or query
         if re.search(r"(calendar|filter|sort|offset|session)", parsed.path.lower()):
             return False
+        if re.search(r"/\d{4}-\d{2}-\d{2}", parsed.path.lower()):
+            return False
         if re.search(r"(tribe-bar-date|ical|eventDisplay|date=|page=|share=)", parsed.query.lower()):
             return False
         return not re.match(
