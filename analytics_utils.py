@@ -75,9 +75,10 @@ def tokenize(soup) -> list[str]:
                     tokens.append(token)
                 token = ''
 
-        # if the file ends on a token
-        if token != '':
+        # if the line ends on a token
+        if token != '' and len(token) > 1 and not is_stop_word(token):
             tokens.append(token)
+        token = ''
     return tokens
 def is_valid(char) -> bool:
     return ('a' <= char <= 'z') or ('0' <= char <= '9')
