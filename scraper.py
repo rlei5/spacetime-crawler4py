@@ -7,16 +7,21 @@ from bs4 import BeautifulSoup
 subdomain_utils._load()
 
 def scraper(url: str, resp) -> list:
+    if not resp or resp.status != 200 or not resp.raw_response or not resp.raw_response.content:
+        return []
+            
+    content_type = resp.raw_response.headers.get("Content-Type", "").lower()
+    if "text/html" not in content_type:
+        return []
     links = extract_next_links(url, resp)
 
-    if resp.status == 200 and resp.raw_response and resp.raw_response.content:
-        content = resp.raw_response.content
+    content = resp.raw_response.content
 
-        subdomain_utils.record_visit(url)
+    subdomain_utils.record_visit(url)
 
-        # process text only if not a near-duplicate
-        # if not analytics_utils.is_duplicate(content):
-        analytics_utils.process_text(url, content)
+    # process text only if not a near-duplicate
+    # if not analytics_utils.is_duplicate(content):
+    analytics_utils.process_text(url, content)
 
     return [link for link in links if is_valid(link)]
 
@@ -96,11 +101,14 @@ def is_valid(url):
         if len(parse_qs(parsed.query)) > 10:
             return False
         # Avoid common trap patterns in path or query
-        if re.search(r"(calendar|filter|sort|offset|session)", parsed.path.lower()):
+        if re.search(r"(calendar|filter|sort|offset|session|timeline|events)", parsed.path.lower()):
             return False
         if re.search(r"/\d{4}-\d{2}(-\d{2})?|/\d{4}/\d{2}", parsed.path.lower()):
             return False
         if re.search(r"(tribe-bar-date|ical|eventDisplay|date=|page=|share=|month=|week=)", parsed.query.lower()):
+            return False
+        # query traps
+        if re.search(r"(rev|action|sort|order|diff|rel|share|afg|do)", parsed.query.lower()):
             return False
         # block dale-cooper trap domain
         if re.search(r"dale-cooper", parsed.hostname):
@@ -110,7 +118,7 @@ def is_valid(url):
             return False
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
-            + r"|png|tiff?|mid|mp2|mp3|mp4"
+            + r"|png|tiff?|mid|mp2|mp3|mp4|mpg"
             + r"|wav|avi|mov|mpeg|ram|m4v|mkv|ogg|ogv|pdf"
             + r"|ps|eps|tex|ppt|pptx|doc|docx|xls|xlsx|names"
             + r"|data|dat|exe|bz2|tar|msi|bin|7z|psd|dmg|iso"
