@@ -1,9 +1,23 @@
 import re
-from urllib.parse import urlparse, urljoin, urldefrag
+from urllib.parse import urlparse, urljoin, urldefrag, parse_qs
+import analytics_utils
+import subdomain_utils
 from bs4 import BeautifulSoup
 
-def scraper(url, resp):
+subdomain_utils._load()
+
+def scraper(url: str, resp) -> list:
     links = extract_next_links(url, resp)
+
+    if resp.status == 200 and resp.raw_response and resp.raw_response.content:
+        content = resp.raw_response.content
+
+        subdomain_utils.record_visit(url)
+
+        # process text only if not a near-duplicate
+        # if not analytics_utils.is_duplicate(content):
+        analytics_utils.process_text(url, content)
+
     return [link for link in links if is_valid(link)]
 
 def extract_next_links(url, resp):
@@ -12,8 +26,21 @@ def extract_next_links(url, resp):
         return []
     if resp.raw_response is None or resp.raw_response.content is None:
         return []
+    # avoid dead pages with no content
+    if len(resp.raw_response.content) < 100:
+        return []
+    # avoid very large files (5MB cap)
+    if len(resp.raw_response.content) > 5 * 1024 * 1024:
+        return []
+    # only process html pages
+    content_type = resp.raw_response.headers.get("Content-Type", "")
+    if "text/html" not in content_type:
+        return []
     try:
         soup = BeautifulSoup(resp.raw_response.content, "html.parser")
+        # avoid pages with low textual content
+        if len(soup.get_text(strip=True)) < 200:
+            return []
         for tag in soup.find_all("a", href=True):
             href = tag.get("href")
             if href is None:
@@ -29,7 +56,7 @@ def extract_next_links(url, resp):
             clean_url, _ = urldefrag(absolute_url)
             if not clean_url.startswith("http"):
                 continue
-            if len(clean_url) > 200:
+            if len(clean_url) > 200: # too long
                 continue
             links.add(clean_url)
     except Exception as e:
@@ -45,10 +72,31 @@ def is_valid(url):
         if parsed.scheme not in set(["http", "https"]):
             return False
         # Make sure to crawl only the URls allowed by the assignment
-        if not re.match(.*(ics|cs|informatics|stat).uci.edu, parsed.hostname):
+        if not re.search(r"(ics|cs|informatics|stat)\.uci\.edu$", parsed.hostname):
             return False
+        # Avoid known trap domains
+        if re.search(r"(wics\.ics|ngs\.ics|gitlab\.ics|grape\.ics)\.uci\.edu$", parsed.hostname):
+            return False
+        # Avoid known trap paths
+        if re.search(r"~eppstein/pix", url.lower()):
+            return False
+        if re.search(r"doku\.php", parsed.path.lower()):
+            if re.search(r"(do=|idx=|maint:)", parsed.query.lower()):
+                return False
         # Try to avoid links that have infinite length
-        if parsed.path.count("/") > 10:
+        if parsed.path.count("/") > 20:
+            return False
+        # Detect repeating path segments (e.g. /a/b/a/b)
+        segments = [s for s in parsed.path.split("/") if s]
+        if len(segments) != len(set(segments)):
+            return False
+        # Avoid URLs with too many query parameters
+        if len(parse_qs(parsed.query)) > 10:
+            return False
+        # Avoid common trap patterns in path or query
+        if re.search(r"(calendar|filter|sort|offset|session)", parsed.path.lower()):
+            return False
+        if re.search(r"(tribe-bar-date|ical|eventDisplay|date=|page=|share=)", parsed.query.lower()):
             return False
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
@@ -60,6 +108,6 @@ def is_valid(url):
             + r"|thmx|mso|arff|rtf|jar|csv"
             + r"|rm|smil|wmv|swf|wma|zip|rar|gz)$", parsed.path.lower())
 
-    except TypeError:
-        print ("TypeError for ", parsed)
-        raise
+    except (TypeError, ValueError):
+        print("Invalid URL: ", url)
+        return False

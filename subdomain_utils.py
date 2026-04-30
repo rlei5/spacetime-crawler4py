@@ -1,0 +1,82 @@
+import shelve
+from urllib.parse import urlparse
+import analytics_utils
+
+SAVE_FILE = "crawler_data"
+_SAVE_EVERY = 50  # save every 50 pages
+
+_state = {
+    "subdomains": {},
+    "unique_pages": set(),
+    "_visit_count": 0,
+}
+
+def _load():
+    with shelve.open(SAVE_FILE) as db:
+        _state["subdomains"] = {k: set(v) for k, v in db.get("subdomains", {}).items()}
+        _state["unique_pages"] = set(db.get("unique_pages", set()))
+        _state["_visit_count"] = db.get("_visit_count", 0)
+
+def save():
+    with shelve.open(SAVE_FILE) as db:
+        db["subdomains"] = {k: list(v) for k, v in _state["subdomains"].items()}
+        db["unique_pages"] = list(_state["unique_pages"])
+        top_fifty, longest_page = analytics_utils.get_report_data()
+        db["top_fifty"] = top_fifty        # dict of words and freqs
+        db["longest_page"] = longest_page  # (url, word_count) tuple
+    print(f"[SAVE] {_state['_visit_count']} pages visited | "
+          f"{len(_state['unique_pages'])} unique | "
+          f"{len(_state['subdomains'])} subdomains found")
+
+
+"""
+def get_report_data():
+    return top_fifty_dict, longest_page_tuple  # whatever they name their variables
+
+"""
+
+_TRAP_THRESHOLD = 500  # warn if a single subdomain exceeds this many pages
+
+def record_subdomain(url):
+    parsed = urlparse(url)
+    host = parsed.netloc.lower()
+    if host.endswith(".uci.edu"):
+        before = len(_state["subdomains"].get(host, set()))
+        _state["subdomains"].setdefault(host, set()).add(url)
+        after = len(_state["subdomains"][host])
+        if after > before and after % 100 == 0:
+            print(f"[SUBDOMAIN] {host} has {after} unique pages")
+        if after == _TRAP_THRESHOLD:
+            print(f"[TRAP WARNING] {host} has reached {_TRAP_THRESHOLD} pages — possible trap")
+
+def record_visit(url):
+    _state["unique_pages"].add(url)
+    record_subdomain(url)
+    _state["_visit_count"] += 1
+    if _state["_visit_count"] % _SAVE_EVERY == 0:
+        save()
+
+#run manually after crawl is completely done
+# python3 -c "from subdomain_utils import generate_report; generate_report()"
+
+def generate_report(output_file="report.txt"):
+    with shelve.open(SAVE_FILE) as db:
+        unique_pages = db.get("unique_pages", set())
+        longest_page = db.get("longest_page", "")
+        top_fifty = db.get("top_fifty", [])
+        subdomains = {k: set(v) for k, v in db.get("subdomains", {}).items()}
+
+    with open(output_file, "w") as f:
+        f.write(f"1. Unique pages found: {len(unique_pages)}\n\n")
+        f.write(f"2. Longest page: {longest_page[0]} ({longest_page[1]} words)\n\n")
+        f.write("3. Top 50 most common words:\n")
+        for word, count in top_fifty.items():
+            f.write(f"   {word} - {count}\n")
+        f.write("\n4. Subdomains in uci.edu (alphabetical):\n")
+        for subdomain in sorted(subdomains):
+            f.write(f"   {subdomain}, {len(subdomains[subdomain])}\n")
+
+    print(f"Report written to {output_file}")
+
+
+# call _load in scraper.py, at the beginning
