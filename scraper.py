@@ -39,7 +39,9 @@ def extract_next_links(url, resp):
     try:
         soup = BeautifulSoup(resp.raw_response.content, "html.parser")
         # avoid pages with low textual content
-        if len(soup.get_text(strip=True)) < 200:
+        tokens = analytics_utils.tokenize(soup) 
+
+        if len(tokens) < 50: # Adjust this threshold based on your needs
             return []
         for tag in soup.find_all("a", href=True):
             href = tag.get("href")
