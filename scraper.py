@@ -46,7 +46,7 @@ def extract_next_links(url, resp):
         # avoid pages with low textual content
         tokens = analytics_utils.tokenize(soup) 
 
-        if len(tokens) < 50: # Adjust this threshold based on your needs
+        if len(tokens) < 10: 
             return []
         for tag in soup.find_all("a", href=True):
             href = tag.get("href")
@@ -79,7 +79,11 @@ def is_valid(url):
         if parsed.scheme not in set(["http", "https"]):
             return False
         # Make sure to crawl only the URls allowed by the assignment
-        if not re.search(r"(^|\.)((ics|cs|informatics|stat)\.uci\.edu)$", parsed.hostname):
+        allowed_suffixes = (".ics.uci.edu", ".cs.uci.edu", ".informatics.uci.edu", ".stat.uci.edu")
+        hostname = parsed.hostname.lower() if parsed.hostname else ""
+
+        if not (hostname in ["ics.uci.edu", "cs.uci.edu", "informatics.uci.edu", "stat.uci.edu"] or 
+                hostname.endswith(allowed_suffixes)):
             return False
         # Avoid known trap domains
         if re.search(r"(wics\.ics|ngs\.ics|gitlab\.ics|grape\.ics)\.uci\.edu$", parsed.hostname):
@@ -95,8 +99,9 @@ def is_valid(url):
             return False
         # Detect repeating path segments (e.g. /a/b/a/b)
         segments = [s for s in parsed.path.split("/") if s]
-        if len(segments) != len(set(segments)):
-            return False
+        for i in range(len(segments) - 1):
+            if segments[i] == segments[i+1]:
+                return False
         # Avoid URLs with too many query parameters
         if len(parse_qs(parsed.query)) > 10:
             return False
