@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 from collections import Counter
+from typing import Dict, Tuple, List
 
 # default table was used from https://www.ranks.nl/stopwords
 STOP_WORDS = ["a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are",
@@ -22,7 +23,7 @@ word_freq = {}
 longest_page_url = ''
 max_number_of_words = 0
 
-def get_report_data() -> tuple[dict, tuple[str, int]]:
+def get_report_data() -> Tuple[Dict, Tuple[str, int]]:
     return find_top_fifty_words(), (longest_page_url, max_number_of_words)
 
 def process_text(url, content) -> None:
@@ -47,7 +48,7 @@ def find_top_fifty_words() -> dict:
     sorted_items = sorted(word_freq.items(), key=lambda item: item[1], reverse=True)
     return dict(sorted_items[:50])
 
-def computeWordFrequencies(tokens_list: list[str]) -> dict:
+def computeWordFrequencies(tokens_list: List[str]) -> dict:
     tokens_dict = {}
 
     for token in tokens_list:
@@ -59,7 +60,7 @@ def computeWordFrequencies(tokens_list: list[str]) -> dict:
     return tokens_dict
 
 # note that get_text() strips HTML tags
-def tokenize(soup) -> list[str]:
+def tokenize(soup) -> List[str]:
     tokens = []
     output = soup.get_text()
 
