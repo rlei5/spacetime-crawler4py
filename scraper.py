@@ -90,8 +90,15 @@ def is_valid(url):
                 hostname.endswith(allowed_suffixes)):
             return False
         # Avoid known trap domains
-        if re.search(r"(wics\.ics|gitlab\.ics|grape\.ics)\.uci\.edu$", parsed.hostname):
+        if re.search(r"(wics\.ics|gitlab\.ics)\.uci\.edu$", parsed.hostname):
             return False
+        if "grape.ics.uci.edu" in parsed.hostname.lower():
+            # Block specific actions
+            if re.search(r"(action|do|rev|diff|oldid|format)=", query):
+                return False
+            # Block management paths
+            if re.search(r"/(login|history|attachment|timeline|search)", path):
+                return False
         # Avoid known trap paths
         if re.search(r"~eppstein/pix", url.lower()):
             return False
