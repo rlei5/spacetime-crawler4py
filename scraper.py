@@ -7,21 +7,25 @@ from bs4 import BeautifulSoup
 subdomain_utils._load()
 
 def scraper(url: str, resp) -> list:
+
+    if not is_valid(resp.url):
+        return []
+    
     if not resp or resp.status != 200 or not resp.raw_response or not resp.raw_response.content:
         return []
             
     content_type = resp.raw_response.headers.get("Content-Type", "").lower()
     if "text/html" not in content_type:
         return []
-    links = extract_next_links(url, resp)
+    links = extract_next_links(resp.url, resp)
 
     content = resp.raw_response.content
 
-    subdomain_utils.record_visit(url)
+    subdomain_utils.record_visit(resp.url)
 
     # process text only if not a near-duplicate
     # if not analytics_utils.is_duplicate(content):
-    analytics_utils.process_text(url, content)
+    analytics_utils.process_text(resp.url, content)
 
     return [link for link in links if is_valid(link)]
 
@@ -86,7 +90,7 @@ def is_valid(url):
                 hostname.endswith(allowed_suffixes)):
             return False
         # Avoid known trap domains
-        if re.search(r"(wics\.ics|ngs\.ics|gitlab\.ics|grape\.ics)\.uci\.edu$", parsed.hostname):
+        if re.search(r"(wics\.ics|gitlab\.ics|grape\.ics)\.uci\.edu$", parsed.hostname):
             return False
         # Avoid known trap paths
         if re.search(r"~eppstein/pix", url.lower()):
