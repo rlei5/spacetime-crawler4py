@@ -94,10 +94,10 @@ def is_valid(url):
             return False
         if "grape.ics.uci.edu" in parsed.hostname.lower():
             # Block specific actions
-            if re.search(r"(action|do|rev|diff|oldid|format)=", query):
+            if re.search(r"(action|do|rev|diff|oldid|format)=", parsed.query.lower()):
                 return False
             # Block management paths
-            if re.search(r"/(login|history|attachment|timeline|search)", path):
+            if re.search(r"/(login|history|attachment|timeline|search)", parsed.path.lower()):
                 return False
         # Avoid known trap paths
         if re.search(r"~eppstein/pix", url.lower()):
