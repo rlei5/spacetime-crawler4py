@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 from collections import Counter
 from typing import Dict, Tuple, List
-from simhash import Simhash
+
 
 # default table was used from https://www.ranks.nl/stopwords
 STOP_WORDS = ["a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are",
@@ -25,10 +25,32 @@ longest_page_url = ''
 max_number_of_words = 0
 seen_hashes = []
 
+def _hash_word(word):
+    h = 0
+    for char in word:
+        h = (h * 31 + ord(char)) % (2**64)
+    return h
+
+def get_simhash(tokens):
+    weights = Counter(tokens)
+    v = [0] * 64
+    for word, weight in weights.items():
+        word_hash = _hash_word(word)
+        for i in range(64):
+            if (word_hash >> i) & 1:
+                v[i] += weight
+            else:
+                v[i] -= weight
+    fingerprint = 0
+    for i in range(64):
+        if v[i] > 0:
+            fingerprint |= (1 << i)
+    return fingerprint
+
 def is_near_duplicate(tokens, threshold=3):
-    new_hash = Simhash(tokens)
+    new_hash = get_simhash(tokens)
     for h in seen_hashes:
-        if new_hash.distance(h) <= threshold:
+        if bin(new_hash ^ h).count('1') <= threshold:
             return True
     seen_hashes.append(new_hash)
     return False
