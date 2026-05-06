@@ -1,0 +1,146 @@
+1. Unique pages found: 7100
+
+2. Longest page: https://cml.ics.uci.edu/category/aiml (16372 words)
+
+3. Top 50 most common words:
+   ics - 18882
+   ramesh - 13803
+   research - 13127
+   uci - 12591
+   information - 11278
+   data - 10976
+   computer - 9450
+   jain - 8562
+   will - 8130
+   students - 8032
+   search - 7783
+   current - 7606
+   computing - 7564
+   support - 7528
+   10 - 7008
+   university - 6882
+   edu - 6726
+   systems - 6619
+   learning - 6613
+   wiki - 6335
+   can - 6331
+   past - 6326
+   software - 6147
+   science - 6131
+   using - 5625
+   read - 5600
+   irvine - 5263
+   news - 5044
+   time - 5014
+   courses - 4874
+   access - 4846
+   events - 4756
+   project - 4724
+   pdf - 4639
+   projects - 4584
+   us - 4540
+   companies - 4386
+   new - 4369
+   books - 4320
+   people - 4314
+   page - 4177
+   log - 4097
+   vision - 4064
+   based - 4019
+   dechter - 4017
+   theme - 4008
+   machine - 3985
+   favorite - 3977
+   conference - 3943
+   may - 3913
+
+4. Subdomains in uci.edu (alphabetical): (89)
+   accessibility.ics.uci.edu, 6
+   acoi.ics.uci.edu, 77
+   archive-beta.ics.uci.edu, 9
+   archive.ics.uci.edu, 212
+   asterix.ics.uci.edu, 7
+   bit.ics.uci.edu, 1
+   cert.ics.uci.edu, 34
+   checkin.ics.uci.edu, 9
+   chenli.ics.uci.edu, 10
+   cloudberry.ics.uci.edu, 4
+   cml.ics.uci.edu, 63
+   code.ics.uci.edu, 14
+   computableplant.ics.uci.edu, 108
+   containers.ics.uci.edu, 1
+   courselisting.ics.uci.edu, 4
+   create.ics.uci.edu, 4
+   cs.ics.uci.edu, 10
+   dgillen.ics.uci.edu, 10
+   ds4all.ics.uci.edu, 9
+   duttgroup.ics.uci.edu, 49
+   dynamo.ics.uci.edu, 31
+   e2.ics.uci.edu, 2
+   edgelab.ics.uci.edu, 7
+   elms.ics.uci.edu, 3
+   emj.ics.uci.edu, 40
+   evoke.ics.uci.edu, 4
+   fellowships.ics.uci.edu, 3
+   flamingo.ics.uci.edu, 29
+   fr.ics.uci.edu, 3
+   futurehealth.ics.uci.edu, 115
+   gradinfo.ics.uci.edu, 1
+   grape.ics.uci.edu, 153
+   graphics.ics.uci.edu, 1
+   helpdesk.ics.uci.edu, 39
+   hobbes.ics.uci.edu, 10
+   hpi.ics.uci.edu, 5
+   hub.ics.uci.edu, 4
+   i-sensorium.ics.uci.edu, 5
+   icde2023.ics.uci.edu, 45
+   ics.uci.edu, 788
+   industryshowcase.ics.uci.edu, 22
+   informatics.ics.uci.edu, 27
+   informatics.uci.edu, 7
+   intranet.ics.uci.edu, 16
+   ipubmed.ics.uci.edu, 1
+   isg.ics.uci.edu, 229
+   jgarcia.ics.uci.edu, 40
+   julia-hub.ics.uci.edu, 2
+   luci.ics.uci.edu, 4
+   mailman.ics.uci.edu, 38
+   malek.ics.uci.edu, 1
+   mcs.ics.uci.edu, 12
+   mds.ics.uci.edu, 8
+   mhcid.ics.uci.edu, 19
+   mswe.ics.uci.edu, 10
+   myip.ics.uci.edu, 1
+   nalini.ics.uci.edu, 7
+   netreg.ics.uci.edu, 3
+   ngs.ics.uci.edu, 1964
+   oai.ics.uci.edu, 6
+   onboarding.ics.uci.edu, 2
+   psearch.ics.uci.edu, 1
+   radicle.ics.uci.edu, 6
+   riscit.ics.uci.edu, 1
+   scale.ics.uci.edu, 7
+   seal.ics.uci.edu, 46
+   sherlock.ics.uci.edu, 7
+   signage.ics.uci.edu, 3
+   speedtest.ics.uci.edu, 1
+   staging-hub.ics.uci.edu, 2
+   stairs.ics.uci.edu, 3
+   stat.ics.uci.edu, 11
+   stat.uci.edu, 2
+   summeracademy.ics.uci.edu, 4
+   support.ics.uci.edu, 13
+   swiki.ics.uci.edu, 221
+   tad.ics.uci.edu, 3
+   tastier.ics.uci.edu, 1
+   tutoring.ics.uci.edu, 5
+   unite.ics.uci.edu, 10
+   vision.ics.uci.edu, 212
+   wiki.ics.uci.edu, 935
+   www-db.ics.uci.edu, 23
+   www.cs.uci.edu, 2
+   www.ics.uci.edu, 1201
+   www.informatics.ics.uci.edu, 6
+   www.informatics.uci.edu, 16
+   www.stat.uci.edu, 4
+   xtune.ics.uci.edu, 6

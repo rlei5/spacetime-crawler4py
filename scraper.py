@@ -23,9 +23,10 @@ def scraper(url: str, resp) -> list:
 
     subdomain_utils.record_visit(resp.url)
 
-    # process text only if not a near-duplicate
-    # if not analytics_utils.is_duplicate(content):
-    analytics_utils.process_text(resp.url, content)
+    soup = BeautifulSoup(content, "html.parser")
+    tokens = analytics_utils.tokenize(soup)
+    if not analytics_utils.is_near_duplicate(tokens):
+        analytics_utils.process_text(resp.url, content)
 
     return [link for link in links if is_valid(link)]
 

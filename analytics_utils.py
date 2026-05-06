@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 from collections import Counter
 from typing import Dict, Tuple, List
-import hashlib
+from simhash import Simhash
 
 # default table was used from https://www.ranks.nl/stopwords
 STOP_WORDS = ["a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are",
@@ -25,26 +25,10 @@ longest_page_url = ''
 max_number_of_words = 0
 seen_hashes = []
 
-def get_simhash(tokens):
-    weights = Counter(tokens)
-    v = [0] * 64
-    for word, weight in weights.items():
-        word_hash = int(hashlib.md5(word.encode('utf-8')).hexdigest(), 16) % (2**64)
-        for i in range(64):
-            if (word_hash >> i) & 1:
-                v[i] += weight
-            else:
-                v[i] -= weight
-    fingerprint = 0
-    for i in range(64):
-        if v[i] > 0:
-            fingerprint |= (1 << i)
-    return fingerprint
-
 def is_near_duplicate(tokens, threshold=3):
-    new_hash = get_simhash(tokens)
+    new_hash = Simhash(tokens)
     for h in seen_hashes:
-        if bin(new_hash ^ h).count('1') <= threshold:
+        if new_hash.distance(h) <= threshold:
             return True
     seen_hashes.append(new_hash)
     return False
@@ -52,13 +36,10 @@ def is_near_duplicate(tokens, threshold=3):
 def get_report_data() -> Tuple[Dict, Tuple[str, int]]:
     return find_top_fifty_words(), (longest_page_url, max_number_of_words)
 
-def process_text(url, content) -> None:
+def process_text(url, tokens) -> None:
     global word_freq
     global longest_page_url
     global max_number_of_words
-
-    soup = BeautifulSoup(content, "html.parser")
-    tokens = tokenize(soup)
 
     # longest page check
     if len(tokens) > max_number_of_words:
