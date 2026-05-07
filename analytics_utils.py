@@ -26,6 +26,10 @@ max_number_of_words = 0
 seen_hashes = []
 
 def _hash_word(word):
+    # basic polynomial rolling hash: each character's position is weighted by powers of 31
+    # 31 is a small prime that distributes bits well across 64 positions
+    # ord() converts each character to its ASCII value
+    # % (2**64) keeps the result within 64 bits
     h = 0
     for char in word:
         h = (h * 31 + ord(char)) % (2**64)
